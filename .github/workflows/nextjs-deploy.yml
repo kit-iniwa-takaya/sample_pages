@@ -26,7 +26,9 @@ jobs:
         run: docker compose build front
 
       - name: Build for static export
-        run: docker compose run --rm front NODE_ENV=production npm run build
+        env:
+          NODE_ENV: production
+        run: docker compose run --rm front npm run build  # 環境変数は env で設定
 
       - name: Add nojekyll
         run: |
