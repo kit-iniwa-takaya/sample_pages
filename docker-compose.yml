@@ -4,14 +4,13 @@ services:
   front:
     build:
       context: next/.
+      target: development
     ports:
       - "1285:1285"
     volumes:
       - ./next:/app
-      - node_modules:/app/node_modules
+      - /app/node_modules
+      - /app/.next
     environment:
       - NODE_ENV=development
     tty: true
-
-volumes:
-  node_modules:

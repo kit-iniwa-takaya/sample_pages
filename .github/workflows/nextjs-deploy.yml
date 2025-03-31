@@ -22,15 +22,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set file permissions
-        run: |
-          sudo chown -R 1000:1000 .
+      - name: Build Docker image
+        run: docker compose build --target production front
 
-      - name: Install packages
-        run: docker compose run --rm front sh -c "npm install"
-
-      - name: Build
-        run: docker compose run --rm front sh -c "npm run build"
+      - name: Build for static export
+        run: docker compose run --rm front npm run build
 
       - name: Add nojekyll
         run: |

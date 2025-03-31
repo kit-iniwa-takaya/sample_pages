@@ -12,42 +12,35 @@ RUN npm ci
 # ==================================================
 FROM node:22.6.0-alpine3.20 AS builder
 WORKDIR /build
+
 COPY --from=deps /base/node_modules ./node_modules
-
-COPY . /build
-COPY package.json ./
-
-# buildは、tsからjsに変換するのでこれがないとエラーになる
-COPY tsconfig.json .
-
-# nextのbuildの設定ルール
-COPY next.config.* .
+COPY . .
 
 RUN npm run build
 
 # ==================================================
-# アプリの実行レイヤー
+# 開発環境用レイヤー
 # ==================================================
-FROM node:22.6.0-alpine3.20
-
+FROM node:22.6.0-alpine3.20 AS development
 WORKDIR /app
 
-COPY --from=builder --chown=node:node /build/.next ./.next
-COPY --from=builder --chown=node:node /build/node_modules ./node_modules
-COPY --from=builder --chown=node:node /build/package.json ./package.json
-
-ARG TOOL="curl unzip"
-
-# AWS CLI v2のインストール
-RUN apk upgrade && \
-    apk add --no-cache \
-        ${TOOL} \
-        bash \
-        aws-cli \
-    && apk del ${TOOL}
-
-USER node
-
-EXPOSE 1285
+COPY --from=deps /base/node_modules ./node_modules
+COPY . .
 
 CMD ["npm", "run", "dev", "--", "-p", "1285"]
+
+# ==================================================
+# 本番環境用レイヤー
+# ==================================================
+FROM node:22.6.0-alpine3.20 AS production
+WORKDIR /app
+
+COPY --from=builder /build/.next ./.next
+COPY --from=builder /build/node_modules ./node_modules
+COPY --from=builder /build/package.json ./package.json
+COPY --from=builder /build/next.config.* ./
+
+USER node
+EXPOSE 1285
+
+CMD ["npm", "start"]
