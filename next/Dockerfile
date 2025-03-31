@@ -27,6 +27,9 @@ WORKDIR /app
 COPY --from=deps /base/node_modules ./node_modules
 COPY . .
 
+# 開発環境用の環境変数を設定
+ENV NODE_ENV=development
+
 CMD ["npm", "run", "dev", "--", "-p", "1285"]
 
 # ==================================================
@@ -39,6 +42,9 @@ COPY --from=builder /build/.next ./.next
 COPY --from=builder /build/node_modules ./node_modules
 COPY --from=builder /build/package.json ./package.json
 COPY --from=builder /build/next.config.* ./
+
+# 本番環境用の環境変数を設定
+ENV NODE_ENV=production
 
 USER node
 EXPOSE 1285

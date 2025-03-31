@@ -23,10 +23,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker compose build front
+        run: docker compose build --build-arg TARGET=production front
 
       - name: Build for static export
-        run: docker compose run --rm front npm run build
+        run: docker compose run --rm --build-arg TARGET=production front npm run build
 
       - name: Add nojekyll
         run: |
