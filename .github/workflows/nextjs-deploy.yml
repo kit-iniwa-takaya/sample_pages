@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker compose build --target production front
+        run: docker compose build front
 
       - name: Build for static export
         run: docker compose run --rm front npm run build
